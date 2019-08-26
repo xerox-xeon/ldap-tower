@@ -19,6 +19,7 @@ $router->get('/', [
     'as' => 'profile','middleware' => 'home', 'uses' => 'HomeController@showHomePage'
 ]);
 
+
 $router->get('/clientip', [
     'as' => 'clientip', 'uses' => 'HomeController@clientIp'
 ]);

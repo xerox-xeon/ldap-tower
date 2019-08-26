@@ -16,49 +16,86 @@ class HomeService
      * @param $host
      * @return int|mixed
      */
-    public function getHostStatus($host) {
-        $defaultStatus = -1;
-        $res = DB::table('tb_site_domain')->select('status')->where('domain_url', '=', $host)->first();
-        if ($res) {
-            return $res->status;
-        }
-        return $defaultStatus;
+    public function getHostUrl($host)
+    {
+        $hostUrl = 'none';
+        $first   = DB::table('tb_site_domain')->select('domain_url')->where('domain_url', '=', $host);
+        $res     = DB::table('tb_site_domain_popu')->select('domain_url')->where('domain_url', '=', $host)->union($first)->first();
 
+        if ($res) {
+            $hostUrl = $res->domain_url;
+        }
+        return $hostUrl;
+
+    }
+
+    public function getHostStatus($host)
+    {
+        $hostStatus = '1';
+        $res        = DB::table('tb_site_domain')->select('status')->where('domain_url', '=', $host)->first();
+        if ($res) {
+            $hostStatus = $res->status;
+        }
+        return $hostStatus;
     }
 
     /**
      * @param $host
      * @return mixed|string
      */
-    public function getHostSiteRes($host) {
-        $defaultSiteFolder = 'default';
-        $res = DB::table('tb_site_domain')->where('domain_url', '=', $host)->first();
+    public function getHostSiteId($host)
+    {
+        $siteId = 'default';
+        $first  = DB::table('tb_site_domain')->select('site_id')->where('domain_url', '=', $host);
+        $res    = DB::table('tb_site_domain_popu')->select('site_id')->where('domain_url', '=', $host)->union($first)->first();
         if ($res) {
-            return $res;
+            $siteId = $res->site_id;
         }
-        return $defaultSiteFolder;
-
+        return $siteId;
     }
 
 
-    public function getHostSiteInfo($siteId) {
-        $defaultSiteInfo = 'none';
-        $res = DB::table('tb_site_identification')->where('site_id', '=', $siteId)->first();
+    /**
+     * @param $siteId
+     * @return mixed|string
+     */
+    public function getHostSiteFolder($siteId)
+    {
+        $siteFolder = 'none';
+        $res        = DB::table('tb_site_domain')->select('site_folder')->where('site_id', '=', $siteId)->first();
         if ($res) {
-            return $res;
+            $siteFolder = $res->site_folder;
         }
-        return $defaultSiteInfo;
+        return $siteFolder;
+    }
 
+    /**
+     * @param $siteId
+     * @return mixed|string
+     */
+    public function getHostSiteName($siteId)
+    {
+        $siteName = 'none';
+        $res      = DB::table('tb_site_identification')->select('site_name')->where('site_id', '=', $siteId)->first();
+        if ($res) {
+            $siteName = $res->site_name;
+        }
+        return $siteName;
     }
 
 
-    public function getExternalUrl($host) {
-        $defaultExternalUrl = 'none';
-        $res = DB::table('tb_site_domain_popu')->where('external_url', '=', $host)->first();
+    /**
+     * @param $host
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Query\Builder|object|string|null
+     */
+    public function getExternalUrl($host)
+    {
+        $externalUrl = 'none';
+        $res         = DB::table('tb_site_domain_popu')->where('external_url', '=', $host)->first();
         if ($res) {
-            return $res;
+            $externalUrl = $res;
         }
-        return $defaultExternalUrl;
+        return $externalUrl;
     }
 
 }
