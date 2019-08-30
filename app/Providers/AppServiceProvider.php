@@ -13,6 +13,12 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
+    public function boot()
+    {
+        view()->share('errors', '');
+        view()->share('request_params', '');
+        view()->share('login_success', '');
+    }
 
     public function register()
     {
@@ -22,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
 //        });
 
         $this->app->bind('HomeService', \App\Http\Services\HomeService::class);
+        $this->app->bind('AccountService', \App\Http\Services\AccountService::class);
 
 
     }

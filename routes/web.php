@@ -23,3 +23,15 @@ $router->get('/', [
 $router->get('/clientip', [
     'as' => 'clientip', 'uses' => 'HomeController@clientIp'
 ]);
+
+
+$router->group(['prefix' => 'account'], function () use ($router) {
+    $router->get('ldap', 'AccountController@getAll');
+    $router->get('register', 'AccountController@register');
+    $router->post('register', 'AccountController@register');
+    $router->get('login', 'AccountController@login');
+    $router->post('login', 'AccountController@login');
+    $router->get('/', 'AccountController@login');
+    $router->get('/changepassword', 'AccountController@changePassword');
+    $router->post('/changepassword', 'AccountController@changePassword');
+});

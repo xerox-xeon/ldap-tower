@@ -50,6 +50,7 @@ class HomeController extends Controller
             'site_path' => $siteFolder . '/pc/dist'
         ];
 
+
         if (!File::exists(resource_path('views/' . $sitePath))) {
             Log::error('path directory:', ['domain' => $httpHost, 'path' => $sitePath]);
             return view( 'default.index', $data);
