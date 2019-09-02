@@ -61,10 +61,11 @@
 									<div class="custom-checkbox custom-control">
 										<input type="checkbox" name="remember" id="remember" class="custom-control-input">
 										<label for="password">
-											<a href="{{ url('/account/changepassword') }}" class="float-right">
+											<a href="{{ url('/account/change') }}" class="float-right">
 												修改密码
 											</a>
 										</label>
+
 										<label for="remember" class="custom-control-label">Remeber Me</label>
 
 									</div>
@@ -76,7 +77,7 @@
 									</button>
 								</div>
 								<div class="mt-4 text-center">
-									Don't have an account? <a href="{{ url('/account/register') }}">创建帐号</a>
+									Don't login to account? <a href="{{ url('/account/forgot') }}">找回密码</a>
 								</div>
 							</form>
 						</div>

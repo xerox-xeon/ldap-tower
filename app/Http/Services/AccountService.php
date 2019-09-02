@@ -11,6 +11,9 @@ namespace App\Http\Services;
 use Carbon\Carbon;
 use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\Ldap\Entry;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Crypt;
+
 
 class AccountService
 {
@@ -99,6 +102,25 @@ class AccountService
 
     }
 
+    //邮箱检测
+    public function emailCheck($data)
+    {
+        $json    = [];
+        $data    = array_map('trim', $data);
+        $email   = $data['email'];
+        $query   = $this->ldap->query($this->config['ldap_base_dn'], '(mail=' . $email . ')');
+        $results = $query->execute()->toArray();
+        if (!$results) {
+            $json = [
+                'request_params' => $data,
+                'errors'         => [
+                    '重置密码失败，邮箱地址不匹配！',
+                ]
+            ];
+        }
+        return $json;
+    }
+
     //修改用户密码
     public function passwordChange($data)
     {
@@ -114,8 +136,57 @@ class AccountService
 
     }
 
+    //重置用户密码
+    public function passwordReset($data)
+    {
+        $data         = array_map('trim', $data);
+        $timestamp    = Carbon::now()->timestamp;
+        $userPassword = $this->getLdapPassWd($data['password']);
+        $entryManager = $this->ldap->getEntryManager();
+        $query        = $this->ldap->query($this->config['ldap_base_dn'], '(mail=' . $data['email'] . ')');
+        $result       = $query->execute();
+        $entry        = $result[0];
+        $description  = $entry->getAttribute('description');
+
+        //检测是否过期
+        if ($timestamp <= $description[0]) {
+            $entry->setAttribute('userPassword', [$userPassword]);
+            $entry->setAttribute('description', []);
+            $entryManager->update($entry);
+            return null;
+        } else {
+            $data = [
+                'errors' => ['msg' => '重置链接时间已经过期，重置密码失败！'],
+            ];
+            return $data;
+        }
+
+    }
+
+    //链接过期时间检测
+    public function verifyUrlTimeOut($data)
+    {
+        $json =[];
+        $data         = array_map('trim', $data);
+        $timestamp    = Carbon::now()->timestamp;
+        $query        = $this->ldap->query($this->config['ldap_base_dn'], '(mail=' . $data['email'] . ')');
+        $result       = $query->execute();
+        $entry        = $result[0];
+        $description  = $entry->getAttribute('description');
+
+        //检测是否过期
+        //dd($timestamp , $description[0]);
+        if ($timestamp > $description[0]) {
+            $json = [
+                'errors' => ['verifyUrlTimeOut' => '重置链接URL已过期失效！'],
+            ];
+        }
+        return $json;
+    }
+
     //用户注册成功
-    public function ldapLoginSuccess()
+    public
+    function ldapLoginSuccess()
     {
         $domain     = env('LDAP_USER_DOMAIN');
         $devOpsItem = [
@@ -131,24 +202,26 @@ class AccountService
     }
 
     //保存注册用户
-    public function ldapStore($data)
+    public
+    function ldapStore($data)
     {
         $data          = array_map('trim', $data);
         $givenName     = mb_substr($data['cnname'], 0, 1, 'utf-8');
         $sn            = mb_substr($data['cnname'], 1, 10, 'utf-8') ? mb_substr($data['cnname'], 1, 10, 'utf-8') : $givenName;
         $uidNumberTime = Carbon::now()->timestamp;
         $record        = [
-            'cn'            => $data['name'],
-            'uid'           => $data['name'],
-            'mail'          => $data['email'],
-            'givenname'     => $givenName, //姓
-            'sn'            => $sn,//名
-            'userpassword'  => $this->getLdapPassWd($data['password']),   //密码
-            'homedirectory' => '/home/users/' . $data['name'],
-            'loginshell'    => '/bin/bash',
-            'gidnumber'     => '0',
-            'uidnumber'     => $uidNumberTime, //唯一
-            'objectclass'   => [
+            'cn'              => $data['name'],
+            'uid'             => $data['name'],
+            'mail'            => $data['email'],
+            'givenname'       => $givenName, //姓
+            'sn'              => $sn,//名
+            'userpassword'    => $this->getLdapPassWd($data['password']),   //密码
+            'homedirectory'   => '/home/users/' . $data['name'],
+            'loginshell'      => '/bin/bash',
+            'gidnumber'       => '0',
+            'uidnumber'       => $uidNumberTime, //唯一
+            'expireTimeStamp' => $uidNumberTime, //过期时间
+            'objectclass'     => [
                 'posixAccount', 'top', 'inetOrgPerson'
             ]
         ];
@@ -159,12 +232,34 @@ class AccountService
 
     }
 
-    public function getAll()
+    public
+    function sendEmail($data)
     {
-        $query   = $this->ldap->query($this->config['ldap_base_dn'], '(|(uid=danny)(mail=dylan@huihuang200.com))');
-        $results = $query->execute()->toArray();
-        dd($results);
+        $url = $this->setExpireDate($data);
+        Mail::raw('MinHow, ' . $url, function ($message) use ($data) {
+            $to = trim($data['email']);
+            $message->sender('noreply@test.com');
+            $message->to($to)->subject('测试邮件');
+        });
     }
 
-
+    public
+    function setExpireDate($data)
+    {
+        $expireTimeStamp = Carbon::tomorrow()->timestamp;
+        $data            = array_map('trim', $data);
+        $email           = $data['email'];
+        $expireArr       = [
+            'email'     => $data['email'],
+            'timeStamp' => $expireTimeStamp,
+        ];
+        $expireData      = encrypt($expireArr);
+        $entryManager    = $this->ldap->getEntryManager();
+        $query           = $this->ldap->query($this->config['ldap_base_dn'], '(mail=' . $email . ')');
+        $result          = $query->execute();
+        $entry           = $result[0];
+        $entry->setAttribute('description', [$expireTimeStamp]);
+        $entryManager->update($entry);
+        return url('/account/reset/' . $expireData);
+    }
 }

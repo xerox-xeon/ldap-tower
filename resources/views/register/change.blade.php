@@ -4,7 +4,7 @@
 	<meta charset="utf-8">
 	<meta name="author" content="Kodinger">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
-	<title>My Login Page</title>
+	<title>用户登录 - {{ env('APP_NAME') }}</title>
 	<link rel="stylesheet" href="{{ url('/asset/register/css/bootstrap.min.css') }}" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 	<link rel="stylesheet" type="text/css" href="{{ url('/asset/register/css/my-login.css') }}">
 </head>
@@ -74,7 +74,7 @@
 
 								<div class="form-group m-0">
 									<button type="submit" class="btn btn-primary btn-block">
-										登 录
+										确 定
 									</button>
 								</div>
 								<div class="mt-4 text-center">

@@ -32,6 +32,11 @@ $router->group(['prefix' => 'account'], function () use ($router) {
     $router->get('login', 'AccountController@login');
     $router->post('login', 'AccountController@login');
     $router->get('/', 'AccountController@login');
-    $router->get('/changepassword', 'AccountController@changePassword');
-    $router->post('/changepassword', 'AccountController@changePassword');
+    $router->get('/change', 'AccountController@changePassword');
+    $router->post('/change', 'AccountController@changePassword');
+    $router->get('/forgot', 'AccountController@findPassword');
+    $router->post('/forgot', 'AccountController@findPassword');
+    $router->get('reset/{verifyCode}', 'AccountController@resetPassword');
+    $router->get('/reset', 'AccountController@resetPassword');
+    $router->post('/reset', 'AccountController@resetPassword');
 });

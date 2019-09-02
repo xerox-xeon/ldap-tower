@@ -23,6 +23,8 @@ $app = new Laravel\Lumen\Application(
 
 //$app->configure('logging');
 
+$app->configure('mail');
+
 $app->withFacades();
 
 //$app->withFacades(true, ['App\Facades\HomeServiceFacade' => 'DD']);
@@ -87,6 +89,7 @@ $app->routeMiddleware([
 */
 
 $app->register(App\Providers\AppServiceProvider::class);
+$app->register(Illuminate\Mail\MailServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 

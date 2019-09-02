@@ -7,6 +7,9 @@
  */
 
 namespace App\Http\Controllers;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -115,6 +118,59 @@ class AccountController extends Controller
 
         }
         return view('register.change');
+    }
+
+    //找回密码
+    public function findPassword(Request $request)
+    {
+        if($request->isMethod('post'))
+        {
+            $validator = Validator::make($request->all(), [
+                'email'    => 'required|email',
+            ]);
+            $data = [
+                'errors'         => $validator->errors()->all(),
+                'request_params' => $request->all(),
+            ];
+            if ($validator->fails()) {
+                return view('register.forgot',$data);
+            }
+            $checkData = $this->accountService->emailCheck($request->all());
+            if ($checkData) {
+                return view('register.forgot',$checkData);
+            }
+            $this->accountService->sendEmail($request->all());
+        }
+        return view('register.forgot');
+    }
+
+    //重置密码
+    public function resetPassword(Request $request, $verifyCode='')
+    {
+        if($request->isMethod('post'))
+        {
+            $res = $this->accountService->passwordReset($request->all());
+            if ($res == null) {
+                return redirect('/account/login');
+            }
+            return redirect('/account/reset/'.$request->all()['verifyCode']);
+        }
+
+        try {
+            $verifyCodeArr = decrypt($verifyCode);
+        } catch (DecryptException $e) {
+            return response('访问链接格式有误，请检查！', 401);
+        }
+        $verifyTimeOut = $this->accountService->verifyUrlTimeOut($verifyCodeArr);
+        $verifyCode = ['verifyCode' => $verifyCode];
+        $data = [
+            'request_params' => array_merge($verifyCodeArr, $verifyCode),
+        ];
+        if ($verifyTimeOut) {
+            $data = array_merge($data, $verifyTimeOut);
+        }
+
+        return view('register.reset',$data);
     }
 
 }
