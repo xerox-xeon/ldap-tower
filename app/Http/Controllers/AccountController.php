@@ -123,6 +123,7 @@ class AccountController extends Controller
     //找回密码
     public function findPassword(Request $request)
     {
+        $data = [];
         if($request->isMethod('post'))
         {
             $validator = Validator::make($request->all(), [
@@ -139,9 +140,9 @@ class AccountController extends Controller
             if ($checkData) {
                 return view('register.forgot',$checkData);
             }
-            $this->accountService->sendEmail($request->all());
+            $data = $this->accountService->sendEmail($request->all());
         }
-        return view('register.forgot');
+        return view('register.forgot', $data);
     }
 
     //重置密码
@@ -149,6 +150,17 @@ class AccountController extends Controller
     {
         if($request->isMethod('post'))
         {
+            $validator = Validator::make($request->all(), [
+                'email'    => 'required|email',
+            ]);
+            $data = [
+                'errors'         => $validator->errors()->all(),
+                'request_params' => $request->all(),
+            ];
+            if ($validator->fails()) {
+                return view('register.reset', $data);
+            }
+
             $res = $this->accountService->passwordReset($request->all());
             if ($res == null) {
                 return redirect('/account/login');
@@ -161,6 +173,7 @@ class AccountController extends Controller
         } catch (DecryptException $e) {
             return response('访问链接格式有误，请检查！', 401);
         }
+
         $verifyTimeOut = $this->accountService->verifyUrlTimeOut($verifyCodeArr);
         $verifyCode = ['verifyCode' => $verifyCode];
         $data = [

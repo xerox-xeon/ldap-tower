@@ -6,6 +6,7 @@
  * Time: 18:33
  */
 return [
+    'from' => ['address' => 'example@example.com', 'name' => env('APP_NAME')],
     'driver' => env('MAIL_DRIVER', 'smtp'),
 	'host' => env('MAIL_HOST'),
 	'port' => env('MAIL_PORT', 587),
@@ -18,5 +19,6 @@ return [
             'verify_peer' => false,
             'verify_peer_name' => false,
         ],
+
     ]
 ];

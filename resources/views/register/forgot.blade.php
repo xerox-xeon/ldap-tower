@@ -31,7 +31,7 @@
 								@endif
 								@if ($login_success)
 									<div class="alert alert-success">
-										<h6><b>已发送密码重置链接，请登录获取：</b></h6>
+										<h6><b>密码重置邮件已发送到，请登录操作：</b></h6>
 										<ol>
 											@foreach ($login_success as $key => $url)
 												<li><a href='mailto:{{ $url }}' target="_blank">{{ $url }}</a></li>
@@ -46,7 +46,7 @@
 										无效的邮箱地址
 									</div>
 									<div class="form-text text-muted">
-										点击“重置密码”，我们将发送密码重置链接
+										点击“找回密”，我们将发送密码重置链接到您的邮箱
 									</div>
 								</div>
 
@@ -66,7 +66,7 @@
 		</div>
 	</section>
 
-	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<script src="{{ url('/asset/register/js/jquery-3.3.1.slim.min.js') }}" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 	<script src="{{ url('/asset/register/js/my-login.js') }}"></script>
 </body>
 </html>

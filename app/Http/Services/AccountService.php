@@ -12,7 +12,7 @@ use Carbon\Carbon;
 use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\Ldap\Entry;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Crypt;
+use App\Mail\ResetConfirmation;
 
 
 class AccountService
@@ -114,9 +114,20 @@ class AccountService
             $json = [
                 'request_params' => $data,
                 'errors'         => [
-                    '重置密码失败，邮箱地址不匹配！',
+                    '邮箱地址不存在！',
                 ]
             ];
+        } else {
+            $entry       = $results[0];
+            $description = $entry->getAttribute('description');
+            if ($description) {
+                $json = [
+                    'request_params' => $data,
+                    'errors'         => [
+                        '重置密码邮件已发送，请查收邮件！',
+                    ]
+                ];
+            }
         }
         return $json;
     }
@@ -166,13 +177,13 @@ class AccountService
     //链接过期时间检测
     public function verifyUrlTimeOut($data)
     {
-        $json =[];
-        $data         = array_map('trim', $data);
-        $timestamp    = Carbon::now()->timestamp;
-        $query        = $this->ldap->query($this->config['ldap_base_dn'], '(mail=' . $data['email'] . ')');
-        $result       = $query->execute();
-        $entry        = $result[0];
-        $description  = $entry->getAttribute('description');
+        $json        = [];
+        $data        = array_map('trim', $data);
+        $timestamp   = Carbon::now()->timestamp;
+        $query       = $this->ldap->query($this->config['ldap_base_dn'], '(mail=' . $data['email'] . ')');
+        $result      = $query->execute();
+        $entry       = $result[0];
+        $description = $entry->getAttribute('description');
 
         //检测是否过期
         //dd($timestamp , $description[0]);
@@ -232,19 +243,33 @@ class AccountService
 
     }
 
-    public
-    function sendEmail($data)
+
+    /**
+     * @param $data
+     * @return array
+     */
+    public function sendEmail($data)
     {
         $url = $this->setExpireDate($data);
-        Mail::raw('MinHow, ' . $url, function ($message) use ($data) {
-            $to = trim($data['email']);
-            $message->sender('noreply@test.com');
-            $message->to($to)->subject('测试邮件');
-        });
+//
+//        Mail::raw('MinHow, ' . $url, function ($message) use ($data) {
+//            $to = trim($data['email']);
+//            $message->sender('noreply@test.com');
+//            $message->to($to)->subject('测试邮件');
+//        });
+        $to = trim($data['email']);
+        Mail::to($to)->send(new ResetConfirmation($url));
+        $json       = [
+            'login_success' => ['email' => $to]
+        ];
+        return $json;
     }
 
-    public
-    function setExpireDate($data)
+    /**
+     * @param $data
+     * @return string
+     */
+    public function setExpireDate($data)
     {
         $expireTimeStamp = Carbon::tomorrow()->timestamp;
         $data            = array_map('trim', $data);
