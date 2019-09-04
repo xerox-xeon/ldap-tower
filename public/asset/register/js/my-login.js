@@ -81,9 +81,17 @@ $(function() {
 	$(".my-login-validation").submit(function() {
 		var form = $(this);
         if (form[0].checkValidity() === false) {
-          event.preventDefault();
-          event.stopPropagation();
+             event.preventDefault();
+             event.stopPropagation();
+
         }
 		form.addClass('was-validated');
+		if (form[0].checkValidity() === true) {
+			$("button[type='submit']", this)
+				//.text("正在发送邮件...")
+				.attr('disabled', 'disabled');
+			//$("#btnSubmit").attr("disabled", true);
+		}
 	});
+
 });

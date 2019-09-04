@@ -107,6 +107,7 @@ class AccountService
     {
         $json    = [];
         $data    = array_map('trim', $data);
+        $timestamp    = Carbon::now()->timestamp;
         $email   = $data['email'];
         $query   = $this->ldap->query($this->config['ldap_base_dn'], '(mail=' . $email . ')');
         $results = $query->execute()->toArray();
@@ -120,7 +121,8 @@ class AccountService
         } else {
             $entry       = $results[0];
             $description = $entry->getAttribute('description');
-            if ($description) {
+            //dd($description , $timestamp);
+            if ($description[0] > $timestamp) {
                 $json = [
                     'request_params' => $data,
                     'errors'         => [
