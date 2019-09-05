@@ -49,9 +49,8 @@ class AccountController extends Controller
                 return view('register.register',$userData);
             }
 
-            $this->accountService->ldapStore($request->all());
-            $successData = $this->accountService->ldapLoginSuccess();
-            return view('register.register',$successData);
+            $ldapStoreData = $this->accountService->ldapStore($request->all());
+            return view('register.register',$ldapStoreData);
 
 
         }
