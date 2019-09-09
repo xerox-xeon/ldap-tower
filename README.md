@@ -2,6 +2,7 @@
 基于OpenLDAP的用户统一认证系统，包括用户注册，用户登录，密码修改，找回密码等功能
 #
 Powered By Lumen
+
 ##注册页面
 ![avatar](resources/images/register.png)
 
