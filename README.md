@@ -1,5 +1,7 @@
 # LDAP-TOWER
 基于OpenLDAP的用户统一认证系统，包括用户注册，用户登录，密码修改，找回密码等功能
+
+适用于公司内部LDAP集中式认证的统一入口用户管理平台。
 #
 Powered By Lumen
 
@@ -12,5 +14,5 @@ Powered By Lumen
 ## 修改密码页面
 ![avatar](resources/images/change.png)
  
-##找回密码页面
+## 找回密码页面
 ![avatar](resources/images/find.png)
