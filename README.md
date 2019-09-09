@@ -3,14 +3,14 @@
 #
 Powered By Lumen
 
-##注册页面
+## 注册页面
 ![avatar](resources/images/register.png)
 
-##登录页面
+## 登录页面
 ![avatar](resources/images/login.png)
 
-##修改密码页面
+## 修改密码页面
 ![avatar](resources/images/change.png)
-
+ 
 ##找回密码页面
 ![avatar](resources/images/find.png)
