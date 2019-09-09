@@ -11,18 +11,11 @@
 |
 */
 
-//$router->get('/', function () use ($router) {
-//    return $router->app->version();
-//});
-
-$router->get('/', [
-    'as' => 'profile','middleware' => 'home', 'uses' => 'HomeController@showHomePage'
-]);
+$router->get('/', function () use ($router) {
+    return $router->app->version();
+});
 
 
-$router->get('/clientip', [
-    'as' => 'clientip', 'uses' => 'HomeController@clientIp'
-]);
 
 
 $router->group(['prefix' => 'account'], function () use ($router) {

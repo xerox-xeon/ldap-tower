@@ -11,4 +11,4 @@
 谢谢<br>
 {{ env('APP_NAME') }}<br>
 {{ env('APP_DOMAIN') }}
-@endcomponent
+@

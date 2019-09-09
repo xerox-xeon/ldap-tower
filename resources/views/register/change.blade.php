@@ -60,7 +60,7 @@
 								<div class="form-group">
 										<label for="password">新密码
 										</label>
-										<input id="password" type="password" class="form-control" name="newPassword" required data-eye>
+										<input idendcomponent="password" type="password" class="form-control" name="newPassword" required data-eye>
 										<div class="invalid-feedback">
 											新密码不能为空！
 										</div>
