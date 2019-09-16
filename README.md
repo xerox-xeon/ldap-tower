@@ -1,5 +1,6 @@
 # LDAP-TOWER
-基于OpenLDAP的用户统一认用户管理平台
+基于OpenLDAP的用户统一认用户管理平台 [OpenLDAP-based user management platform]
+
 
 适用于公司内部LDAP集中式认证的用户入口管理平台。
 #
